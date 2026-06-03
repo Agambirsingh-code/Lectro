@@ -181,7 +181,7 @@ export const LiveAINotes: React.FC<LiveAINotesProps> = ({
                 recog.onend = null;
                 recog.abort();
                 recog.stop();
-            } catch {}
+            } catch {   }
             recogRef.current = null;
             runningRef.current = false;
         };
