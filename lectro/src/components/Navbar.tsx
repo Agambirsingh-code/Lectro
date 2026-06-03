@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Modal, Button, Textarea } from "flowbite-react";
+import { Modal } from "flowbite-react";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { CCButton } from "./CCButton";
@@ -56,26 +56,39 @@ export function LectroNavbar({
     };
 
     const handleCreateLecture = async () => {
-        // First create the lecture document
-        const docRef = await addDoc(collection(db, "lectures"), {
-            title,
-            description,
-            createdAt: new Date(),
-        });
+        console.log("1. Create button clicked!");
+        console.log("Title:", title, "| Description:", description);
 
-        // Initialize the editor content subcollection
-        const contentRef = doc(db, `lectures/${docRef.id}/content/editor`);
-        await setDoc(contentRef, {
-            content: `<h1>${title}</h1>${
-                description ? `<p>${description}</p>` : ""
-            }`,
-            lastModified: new Date(),
-        });
+        try {
+            console.log("2. Attempting to save to Firebase...");
+            // First create the lecture document
+            const docRef = await addDoc(collection(db, "lectures"), {
+                title,
+                description,
+                createdAt: new Date(),
+            });
+            console.log("3. Success! Lecture created with ID:", docRef.id);
 
-        setShowModal(false);
-        setTitle("");
-        setDescription("");
-        navigate(`/lecture/${docRef.id}`);
+            // Initialize the editor content subcollection
+            const contentRef = doc(db, `lectures/${docRef.id}/content/editor`);
+            await setDoc(contentRef, {
+                content: `<h1>${title}</h1>${
+                    description ? `<p>${description}</p>` : ""
+                }`,
+                lastModified: new Date(),
+            });
+            console.log("4. Editor subcollection created.");
+
+            setShowModal(false);
+            setTitle("");
+            setDescription("");
+            
+            console.log("5. Navigating to:", `/lecture/${docRef.id}`);
+            navigate(`/lecture/${docRef.id}`);
+        } catch (error) {
+            console.error("❌ ERROR CREATING LECTURE:", error);
+            alert("Failed to create lecture! Check the console for details.");
+        }
     };
 
     return (
@@ -139,7 +152,7 @@ export function LectroNavbar({
                                 <input
                                     type="search"
                                     id="lecture-search"
-                                    className="text-m block w-full p-2 pl-8 bg-slate-800/50 border border-slate-700/50 rounded-xl text-black placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:shadow-[0_0_12px_rgba(34,211,238,0.4)] focus:border-transparent transition-all shadow-md hover:bg-slate-800/70"
+                                    className="text-m block w-full p-2 pl-8 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:shadow-[0_0_12px_rgba(34,211,238,0.4)] focus:border-transparent transition-all shadow-md hover:bg-slate-800/70"
                                     placeholder="Search lectures..."
                                 />
                             </div>
@@ -184,7 +197,6 @@ export function LectroNavbar({
                             Create New Lecture
                         </h2>
                         <div className="w-full space-y-4">
-                            {/* ✨ UPDATED: Better input styling */}
                             <div>
                                 <label className="block text-sm font-medium text-white mb-2">
                                     Title
