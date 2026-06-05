@@ -64,6 +64,45 @@ app.post("/api/summarize", async (req, res) => {
   }
 });
 
+// Generate Quiz Route
+app.post("/api/generate-quiz", async (req, res) => {
+  const { content } = req.body;
+  
+  console.log("🧠 Received quiz request, content length:", content?.length || 0);
+  
+  if (!content || content.trim().length < 20) {
+    return res.status(400).json({ error: "Not enough content to generate a quiz." });
+  }
+  
+  try {
+    const prompt = `Based on the following lecture notes, generate a 3-question multiple-choice quiz to test the student's understanding. 
+    You MUST return ONLY a valid JSON object with a single key called "questions". 
+    The value of "questions" should be an array of objects, where each object has exactly these keys:
+    - "question": The question text.
+    - "options": An array of 4 possible answer strings.
+    - "correctAnswer": The exact string of the correct option.
+    - "explanation": A brief 1-sentence explanation of why the answer is correct.
+
+    Lecture Notes:
+    ${content}`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" }, // Forces ChatGPT to return clean JSON
+    });
+    
+    // Parse the JSON string from OpenAI into a real JavaScript object
+    const quizData = JSON.parse(response.choices[0].message.content);
+    console.log("✅ Quiz generated successfully!");
+    
+    res.json(quizData);
+  } catch (err) {
+    console.error("❌ Quiz generation error:", err);
+    res.status(500).json({ error: "Failed to generate quiz" });
+  }
+});
+
 // Define term (optional - add back if needed)
 app.post("/api/define", async (req, res) => {
   const { term } = req.body;
