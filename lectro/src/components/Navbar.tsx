@@ -8,6 +8,7 @@ import { AINotesButton } from "./AINotesButton";
 import { PlusButton } from "./PlusButton";
 import { SettingsDropdown } from "./SettingsDropdown";
 import { DyslexicFontButton } from "./DyslexicFontButton";
+import { QuizButton } from "./QuizButton";
 
 type Props = {
     recordMode?: boolean;
@@ -17,6 +18,8 @@ type Props = {
     onToggleAINotes?: () => void;
     dyslexicFontActive?: boolean;
     onToggleDyslexicFont?: () => void;
+    onGenerateQuiz?: () => void;
+    isGeneratingQuiz?: boolean;
 };
 
 export function LectroNavbar({
@@ -27,6 +30,8 @@ export function LectroNavbar({
     onToggleAINotes,
     dyslexicFontActive: dyslexicFontActiveProp,
     onToggleDyslexicFont,
+    onGenerateQuiz,
+    isGeneratingQuiz,
 }: Props) {
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
@@ -127,6 +132,11 @@ export function LectroNavbar({
                             <DyslexicFontButton
                                 isActive={dyslexicFontActiveProp ?? false}
                                 onClick={onToggleDyslexicFont ?? (() => {})}
+                            />
+                            {/* ✨ The new Quiz Button! */}
+                            <QuizButton 
+                                onClick={onGenerateQuiz ?? (() => {})} 
+                                isGenerating={isGeneratingQuiz ?? false} 
                             />
                         </div>
                     ) : (
