@@ -34,3 +34,18 @@ export async function transcribeAudio(audioBlob: Blob) {
     if (!res.ok) throw new Error("Transcription failed");
     return await res.json();
 }
+
+// Generate a quiz from lecture notes
+export async function generateQuiz(content: string) {
+    const res = await fetch(`${BASE_URL}/api/generate-quiz`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+    });
+    
+    if (!res.ok) {
+        throw new Error("Failed to generate quiz");
+    }
+    
+    return await res.json();
+}
